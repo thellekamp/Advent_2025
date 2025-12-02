@@ -14,17 +14,28 @@ let item (text:string) =
     | _ -> 0
     * (text.[1..] |> Int32.Parse)
 
-let advent2025_1 items = 
-    let nextAcc acc num = 
-        let newVal = fst(acc) + num
-        match newVal % 100 with
-        | 0 -> (0, snd(acc) + 1)
-        | _ -> (newVal, snd(acc))
+let accFunc_1_1 acc num = 
+    let newVal = fst(acc) + num
+    match newVal % 100 with
+    | 0 -> (0, snd(acc) + 1)
+    | _ -> (newVal, snd(acc))
 
+let accFunc_1_2 acc num = 
+    let newVal = fst(acc) + num
+    match (sign(fst(acc)), sign(newVal)) with
+    | (1, -1) | (-1, 1) -> (newVal, snd(acc) + 1)
+    | ( _ , 0) -> (newVal, snd(acc) + 1)
+    | _ -> (newVal, snd(acc))
+    |> fun (a,b) -> (a % 100, b + (abs(a) / 100))
+
+let advent2025_1 accFunc items = 
     items 
     |> Array.map item
-    |> Array.fold nextAcc (50, 0)
+    |> Array.fold accFunc (50, 0)
     |> snd
 
-testItems |> advent2025_1 |> printfn "%A"
-lines |> advent2025_1 |> printfn "%A"
+testItems |> advent2025_1 accFunc_1_1 |> printfn "test 1: %A"
+lines |> advent2025_1 accFunc_1_1 |> printfn "result 1: %A"
+testItems |> advent2025_1 accFunc_1_2 |> printfn "test 2: %A"
+lines |> advent2025_1 accFunc_1_2 |> printfn "result 2: %A"
+
